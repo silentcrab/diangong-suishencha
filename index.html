@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>电工随身查 V1.7｜余师傅讲用电</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f6f7;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    header {
+      background: #0a59f7;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+    header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    .container {
+      padding: 15px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    label {
+      font-size: 14px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background: #0a59f7;
+      color: #fff;
+      border: none;
+      margin-top: 12px;
+    }
+    .result {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      padding: 15px 0 25px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ 电工随身查 V1.7</h1>
+  <p>余师傅讲用电 · 算清楚再施工</p>
+</header>
+
+<div class="container">
+
+  <!-- 功率 / 电流计算 -->
+  <div class="card">
+    <h2>🔢 功率 / 电流计算</h2>
+    <label>用电类型</label>
+    <select id="type">
+      <option value="single">单相 220V</option>
+      <option value="three">三相 380V</option>
+    </select>
+
+    <label>功率（kW）</label>
+    <input type="number" id="power" placeholder="例如：3">
+
+    <button onclick="calc()">计算</button>
+
+    <div class="result" id="calcResult"></div>
+  </div>
+
+  <!-- 故障速查 -->
+  <div class="card">
+    <h2>🧠 故障判断速查</h2>
+    <select id="fault">
+      <option value="">请选择故障现象</option>
+      <option>一合闸就跳</option>
+      <option>运行一会跳闸</option>
+      <option>设备不启动</option>
+      <option>电机发热严重</option>
+    </select>
+    <button onclick="faultCheck()">查询</button>
+    <div class="result" id="faultResult"></div>
+  </div>
+
+  <!-- 使用指南 -->
+  <div class="card">
+    <h2>📘 使用指南</h2>
+    <div class="result">
+      ① 输入设备功率，先算电流<br>
+      ② 根据电流选择线径和空开<br>
+      ③ 出现问题，先用故障速查判断方向<br>
+      ④ 本工具用于<strong>施工前参考</strong>，复杂情况以现场为准
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 余师傅讲用电 ｜ 电工随身查
+</footer>
+
+<script>
+  function calc() {
+    const type = document.getElementById('type').value;
+    const power = parseFloat(document.getElementById('power').value);
+    if (!power) {
+      document.getElementById('calcResult').innerHTML = "请输入功率";
+      return;
+    }
+    let current;
+    if (type === 'single') {
+      current = power * 1000 / 220;
+    } else {
+      current = power * 1000 / (1.732 * 380);
+    }
+
+    let wire = current <= 16 ? "2.5mm²"
+             : current <= 25 ? "4mm²"
+             : current <= 32 ? "6mm²"
+             : "≥10mm²";
+
+    document.getElementById('calcResult').innerHTML =
+      `计算电流约 <b>${current.toFixed(1)} A</b><br>
+       建议铜线：<b>${wire}</b><br>
+       空开电流 ≥ <b>${Math.ceil(current / 5) * 5}A</b>`;
+  }
+
+  function faultCheck() {
+    const f = document.getElementById('fault').value;
+    let r = "";
+    if (f === "一合闸就跳") r = "常见原因：线路短路、漏保接线错误、负载严重异常";
+    if (f === "运行一会跳闸") r = "常见原因：过载、接触不良、设备发热";
+    if (f === "设备不启动") r = "常见原因：缺相、控制回路问题、接触器损坏";
+    if (f === "电机发热严重") r = "常见原因：过载、选型偏小、电压异常";
+    document.getElementById('faultResult').innerHTML = r || "请选择故障现象";
+  }
+</script>
+
+</body>
+</html>
